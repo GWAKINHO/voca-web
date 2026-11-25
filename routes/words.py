@@ -90,3 +90,13 @@ def delete_word(word_id):
     except WordError as e:
         return _back(err=str(e))
     return _back(msg="단어와 관련 이력을 삭제했습니다.")
+
+
+@bp.post("/reset")
+def reset_all():
+    """단어장과 모든 학습·시험 이력을 초기화한다 (데이터 설계서 §6.1)."""
+    try:
+        ws.reset_all_data(request_db(), request.form.get("confirm_text", ""))
+    except WordError as e:
+        return _back(err=str(e))
+    return _back(msg="단어장과 모든 학습·시험 이력을 초기화했습니다.")

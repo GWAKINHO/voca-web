@@ -87,4 +87,17 @@
     <a href="{{ url_for('words.list_words', q=q, page=page + 1) }}">다음</a>
   {% endif %}
 </nav>
+
+<section>
+  <details>
+    <summary>단어장 전체 초기화 (되돌릴 수 없음)</summary>
+    <p class="err">단어, 일차 배정, 암기 기록, 시험 기록이 모두 삭제되며 되돌릴 수 없습니다.</p>
+    <form method="post" action="{{ url_for('words.reset_all') }}">
+      <label>확인 문구 <code>전체삭제</code> 입력
+        <input name="confirm_text" required autocomplete="off" placeholder="전체삭제">
+      </label>
+      <button type="submit">전체 초기화 실행</button>
+    </form>
+  </details>
+</section>
 {% endblock %}

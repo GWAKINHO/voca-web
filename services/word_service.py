@@ -103,3 +103,19 @@ def list_words(conn, q: str = "", page: int = 1, per_page: int = WORDS_PER_PAGE)
         (*params, per_page, offset),
     ).fetchall()
     return rows, total
+
+
+RESET_CONFIRM_TEXT = "전체삭제"
+
+
+def reset_all_data(conn, confirm_text: str) -> None:
+    """단어장과 모든 학습·시험 이력을 한 트랜잭션으로 삭제한다 (데이터 설계서 §6.1)."""
+    if (confirm_text or "") != RESET_CONFIRM_TEXT:
+        raise WordError(f'확인 문구로 "{RESET_CONFIRM_TEXT}"를 정확히 입력하세요.')
+    try:
+        with conn:
+            for table in ("exam_item", "exam_attempt", "study_log", "plan", "study_day", "words"):
+                conn.execute(f"DELETE FROM {table}")
+    except Exception:
+        conn.rollback()
+        raise
