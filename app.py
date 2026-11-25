@@ -7,6 +7,8 @@ from flask import Flask, render_template
 
 from config import DB_PATH, MAX_CONTENT_LENGTH, SECRET_KEY
 from db import close_request_db, init_db
+from routes.auth import bp as auth_bp
+from routes.auth import current_user
 from routes.exam import bp as exam_bp
 from routes.settings import bp as settings_bp
 from routes.stats import bp as stats_bp
@@ -22,11 +24,16 @@ def create_app() -> Flask:
     init_db(DB_PATH)
     app.teardown_appcontext(close_request_db)
 
+    app.register_blueprint(auth_bp, url_prefix="/auth")
     app.register_blueprint(words_bp, url_prefix="/words")
     app.register_blueprint(study_bp, url_prefix="/study")
     app.register_blueprint(exam_bp, url_prefix="/exam")
     app.register_blueprint(stats_bp, url_prefix="/stats")
     app.register_blueprint(settings_bp, url_prefix="/settings")
+
+    @app.context_processor
+    def inject_user():
+        return {"current_user": current_user()}
 
     @app.get("/")
     def index():

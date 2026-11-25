@@ -1,7 +1,13 @@
 {% extends "base.html" %}
 {% block title %}학습 진척 통계 · SmartVoca{% endblock %}
 {% block content %}
-<h1>학습 진척 통계</h1>
+<h1>학습 진척 통계
+  {% if current_user %}
+    <span class="chip chip-primary" style="vertical-align:middle;">{{ current_user['username'] }}</span>
+  {% else %}
+    <span class="chip" style="vertical-align:middle;">게스트 모드</span>
+  {% endif %}
+</h1>
 <p class="subtitle">암기 진행률, 시험 성적 추이, 자주 틀리는 단어를 한눈에 확인하세요.</p>
 
 <section class="card">

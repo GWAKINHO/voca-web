@@ -9,6 +9,7 @@ from flask import Blueprint, redirect, render_template, request, url_for
 
 from config import today_kst
 from db import request_db
+from routes.auth import current_user_id
 from services import study_service as ss
 
 # app.py 에서 url_prefix="/study" 로 등록한다
@@ -18,8 +19,9 @@ bp = Blueprint("study", __name__)
 @bp.get("")
 def today():
     conn = request_db()
-    day_no = ss.assign_today(conn, today_kst())
-    cards = ss.build_cards(conn, day_no) if day_no else []
+    uid = current_user_id()
+    day_no = ss.assign_today(conn, today_kst(), user_id=uid)
+    cards = ss.build_cards(conn, day_no, user_id=uid) if day_no else []
 
     if not cards:
         return render_template("study/today.html", state="empty")
@@ -46,12 +48,13 @@ def next_card():
     기록할 일차는 서버가 오늘 기준으로 다시 구한다. 폼 값은 믿지 않는다.
     """
     conn = request_db()
+    uid = current_user_id()
     word_id = request.form.get("word_id", type=int)
     i = request.form.get("i", default=0, type=int)
-    day_no = ss.assign_today(conn, today_kst())
+    day_no = ss.assign_today(conn, today_kst(), user_id=uid)
     if word_id and day_no:
         try:
-            ss.record_study(conn, word_id, day_no)
+            ss.record_study(conn, word_id, day_no, user_id=uid)
         except sqlite3.IntegrityError:
             # 기록 사이에 단어가 삭제됐다면 기록 없이 넘어간다
             conn.rollback()

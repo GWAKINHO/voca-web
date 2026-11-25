@@ -6,6 +6,7 @@
 from flask import Blueprint, redirect, render_template, request, url_for
 
 from db import request_db
+from routes.auth import current_user_id
 from services import settings_service as ssvc
 from services.settings_service import SettingsError
 
@@ -24,9 +25,10 @@ def _parse_int(name: str, label: str) -> int:
 @bp.get("")
 def index():
     conn = request_db()
+    uid = current_user_id()
     return render_template(
         "settings/index.html",
-        settings=ssvc.get_settings(conn),
+        settings=ssvc.get_settings(conn, user_id=uid),
         msg=request.args.get("msg", ""),
         err=request.args.get("err", ""),
     )
@@ -35,6 +37,7 @@ def index():
 @bp.post("")
 def save():
     conn = request_db()
+    uid = current_user_id()
     try:
         daily_count = _parse_int("daily_count", "하루 학습량")
         review_ratio = _parse_int("review_ratio", "복습 비율")
@@ -51,6 +54,7 @@ def save():
             exam_count=exam_count,
             exam_direction=exam_direction,
             exam_qtypes=exam_qtypes,
+            user_id=uid,
         )
     except SettingsError as e:
         return redirect(url_for("settings.index", err=str(e)))
@@ -60,5 +64,5 @@ def save():
 @bp.post("/reset")
 def reset():
     conn = request_db()
-    ssvc.reset_settings(conn)
+    ssvc.reset_settings(conn, user_id=current_user_id())
     return redirect(url_for("settings.index", msg="설정을 기본값으로 되돌렸습니다."))

@@ -33,7 +33,7 @@ class WordServiceTest(unittest.TestCase):
             )
         }
         self.assertTrue(
-            {"words", "study_day", "plan", "study_log", "exam_attempt", "exam_item", "user_settings"}
+            {"users", "words", "study_day", "plan", "study_log", "exam_attempt", "exam_item", "user_settings"}
             <= names
         )
         version = self.conn.execute("PRAGMA user_version").fetchone()[0]

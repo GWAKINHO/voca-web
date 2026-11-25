@@ -34,8 +34,8 @@ def _iso(dt: datetime) -> str:
     return dt.isoformat(timespec="seconds")
 
 
-def word_weights(conn, now=None) -> dict[int, int]:
-    """모든 단어의 출제 가중치를 계산한다 (D-6).
+def word_weights(conn, now=None, user_id: int = 0) -> dict[int, int]:
+    """모든 단어의 출제 가중치를 계정별로 계산한다 (D-6, FR-043).
 
     기본 1점 + 답한 기록 없음 +3 + 마지막 답변 7일 이상 전 +2 + 오답률 50% 이상 +2.
     """
@@ -43,12 +43,14 @@ def word_weights(conn, now=None) -> dict[int, int]:
     word_ids = [r[0] for r in conn.execute("SELECT id FROM words ORDER BY id")]
     stats = {}
     rows = conn.execute(
-        "SELECT word_id, COUNT(*) AS total, "
-        "SUM(CASE WHEN is_correct = 0 THEN 1 ELSE 0 END) AS wrong, "
-        "MAX(answered_at) AS last_at "
-        "FROM exam_item "
-        "WHERE word_id IS NOT NULL AND is_correct IS NOT NULL "
-        "GROUP BY word_id"
+        "SELECT ei.word_id, COUNT(*) AS total, "
+        "SUM(CASE WHEN ei.is_correct = 0 THEN 1 ELSE 0 END) AS wrong, "
+        "MAX(ei.answered_at) AS last_at "
+        "FROM exam_item ei "
+        "JOIN exam_attempt ea ON ea.id = ei.attempt_id "
+        "WHERE ea.user_id = ? AND ei.word_id IS NOT NULL AND ei.is_correct IS NOT NULL "
+        "GROUP BY ei.word_id",
+        (user_id,),
     )
     for r in rows:
         stats[r["word_id"]] = r
@@ -107,7 +109,7 @@ def _build_item(word, all_words, direction, qtype, rng):
     return actual_qtype, actual_dir, prompt, expected, choices_json
 
 
-def create_attempt(conn, count, direction, qtypes, *, now=None, rng=None) -> int:
+def create_attempt(conn, count, direction, qtypes, *, now=None, rng=None, user_id: int = 0) -> int:
     """시험 1회를 출제해 exam_attempt 와 exam_item 을 저장하고 attempt_id 를 돌려준다."""
     if not isinstance(count, int) or count < MIN_QUESTIONS or count > MAX_QUESTIONS:
         raise ExamError(f"문제 수는 {MIN_QUESTIONS}~{MAX_QUESTIONS} 사이 정수여야 합니다.")
@@ -123,14 +125,14 @@ def create_attempt(conn, count, direction, qtypes, *, now=None, rng=None) -> int
 
     current = _now(now)
     rand = rng or random.Random()
-    weights_map = word_weights(conn, now=current)
+    weights_map = word_weights(conn, now=current, user_id=user_id)
     picked = _weighted_sample(all_words, weights_map, count, rand)
 
     stamp = _iso(current)
     cur = conn.execute(
-        "INSERT INTO exam_attempt (created_at, submitted_at, direction, total, correct) "
-        "VALUES (?, NULL, ?, ?, NULL)",
-        (stamp, direction, len(picked)),
+        "INSERT INTO exam_attempt (user_id, created_at, submitted_at, direction, total, correct) "
+        "VALUES (?, ?, NULL, ?, ?, NULL)",
+        (user_id, stamp, direction, len(picked)),
     )
     attempt_id = cur.lastrowid
 
@@ -152,15 +154,15 @@ def create_attempt(conn, count, direction, qtypes, *, now=None, rng=None) -> int
     return attempt_id
 
 
-def get_attempt(conn, attempt_id: int) -> dict:
+def get_attempt(conn, attempt_id: int, user_id: int | None = None) -> dict:
     row = conn.execute("SELECT * FROM exam_attempt WHERE id = ?", (attempt_id,)).fetchone()
-    if row is None:
+    if row is None or (user_id is not None and row["user_id"] != user_id):
         raise NotFoundError("존재하지 않는 시험입니다.")
     return dict(row)
 
 
-def get_items(conn, attempt_id: int) -> list[dict]:
-    get_attempt(conn, attempt_id)  # 존재 여부 확인
+def get_items(conn, attempt_id: int, user_id: int | None = None) -> list[dict]:
+    get_attempt(conn, attempt_id, user_id=user_id)  # 존재 및 소유 여부 확인
     rows = conn.execute(
         "SELECT * FROM exam_item WHERE attempt_id = ? ORDER BY seq", (attempt_id,)
     ).fetchall()
@@ -185,13 +187,13 @@ def _is_correct(item: dict, given: str) -> bool:
     return ans.lower() == item["expected"].strip().lower()
 
 
-def grade(conn, attempt_id: int, answers: dict, *, now=None) -> dict:
+def grade(conn, attempt_id: int, answers: dict, *, now=None, user_id: int | None = None) -> dict:
     """시험 답안을 채점해 저장한다. 이미 제출된 시험은 재채점하지 않는다."""
-    attempt = get_attempt(conn, attempt_id)
+    attempt = get_attempt(conn, attempt_id, user_id=user_id)
     if attempt["submitted_at"] is not None:
         return attempt
 
-    items = get_items(conn, attempt_id)
+    items = get_items(conn, attempt_id, user_id=user_id)
     stamp = _iso(_now(now))
     correct_count = 0
     updates = []

@@ -18,6 +18,17 @@
         <a href="{{ url_for('stats.index') }}" class="{{ 'active' if request.endpoint and request.endpoint.startswith('stats.') }}">통계</a>
         <a href="{{ url_for('settings.index') }}" class="{{ 'active' if request.endpoint and request.endpoint.startswith('settings.') }}">설정</a>
       </nav>
+      <div style="display:flex; align-items:center; gap:8px;">
+        {% if current_user %}
+          <span class="chip chip-primary">{{ current_user['username'] }}</span>
+          <form method="post" action="{{ url_for('auth.logout') }}" style="margin:0;">
+            <button type="submit" class="btn-outlined btn-sm">로그아웃</button>
+          </form>
+        {% else %}
+          <a class="btn btn-tonal btn-sm" href="{{ url_for('auth.login_form') }}">로그인</a>
+          <a class="btn btn-outlined btn-sm" href="{{ url_for('auth.register_form') }}">회원가입</a>
+        {% endif %}
+      </div>
     </div>
   </header>
   <main>

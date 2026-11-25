@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}회원가입 · SmartVoca{% endblock %}
+{% block content %}
+<div style="max-width:460px; margin:20px auto 0;">
+  <h1>회원가입</h1>
+  <p class="subtitle">새 계정을 만들면 개인별 암기 진도·시험 이력·통계·설정이 분리됩니다.</p>
+
+  {% if err %}<div class="banner err-banner">{{ err }}</div>{% endif %}
+
+  <form class="card" method="post" action="{{ url_for('auth.register') }}">
+    <div class="field" style="margin-bottom:14px;">
+      <label for="reg-username">아이디 (2~24자, 영문·숫자·한글·_·-)</label>
+      <input id="reg-username" type="text" name="username" required minlength="2" maxlength="24" autocomplete="username" placeholder="예: study_kim">
+    </div>
+    <div class="field" style="margin-bottom:14px;">
+      <label for="reg-password">비밀번호 (4자 이상)</label>
+      <input id="reg-password" type="password" name="password" required minlength="4" maxlength="100" autocomplete="new-password" placeholder="비밀번호 입력">
+    </div>
+    <div class="field" style="margin-bottom:18px;">
+      <label for="reg-password2">비밀번호 확인</label>
+      <input id="reg-password2" type="password" name="password_confirm" required minlength="4" maxlength="100" autocomplete="new-password" placeholder="비밀번호 다시 입력">
+    </div>
+    <div style="margin-bottom:20px;">
+      <label class="choice-pill" style="width:100%;">
+        <input type="checkbox" name="is_public" value="1">
+        내 학습 진척 통계를 다른 사용자에게 공개하기 (나중에 설정에서 변경 가능)
+      </label>
+    </div>
+    <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+      <button type="submit">가입하고 시작하기</button>
+      <a class="btn btn-outlined" href="{{ url_for('auth.login_form') }}">이미 계정이 있나요?</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

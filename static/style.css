@@ -133,7 +133,7 @@ button:active, .btn:active { transform: scale(.98); }
 .form-row { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px; }
 .field { display: flex; flex-direction: column; gap: 5px; flex: 1 1 180px; }
 .field label, label.field-label { font-size: .85rem; font-weight: 600; color: var(--md-on-surface-variant); }
-input[type="text"], input[type="number"], input:not([type]), input[type="file"] {
+input[type="text"], input[type="password"], input[type="number"], input:not([type]), input[type="file"] {
   width: 100%; padding: 10px 14px; border-radius: 12px;
   border: 1px solid var(--md-outline); background: var(--md-surface-card);
   color: var(--md-on-surface); font: inherit; font-size: .94rem;
