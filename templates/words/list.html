@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}단어 목록 · 단어장{% endblock %}
+{% block content %}
+<h1>단어 목록</h1>
+
+{% if msg %}<p class="msg">{{ msg }}</p>{% endif %}
+{% if err %}<p class="err">{{ err }}</p>{% endif %}
+
+<section>
+  <h2>단어 등록</h2>
+  <form method="post" action="{{ url_for('words.create_word') }}">
+    <label>영단어 <input name="en" required maxlength="100"></label>
+    <label>뜻 <input name="ko" required maxlength="200"></label>
+    <button type="submit">등록</button>
+  </form>
+</section>
+
+<section>
+  <h2>검색</h2>
+  <form method="get" action="{{ url_for('words.list_words') }}">
+    <input name="q" value="{{ q }}" placeholder="영단어 또는 뜻">
+    <button type="submit">검색</button>
+  </form>
+  <p>전체 {{ total }}개</p>
+</section>
+
+<section>
+  <table>
+    <thead>
+      <tr><th>영단어</th><th>뜻</th><th>관리</th></tr>
+    </thead>
+    <tbody>
+      {% for row in rows %}
+      <tr>
+        <td>{{ row['en'] }}</td>
+        <td>{{ row['ko'] }}</td>
+        <td>
+          <details>
+            <summary>수정</summary>
+            <form method="post" action="{{ url_for('words.edit_word', word_id=row['id']) }}">
+              <input name="en" value="{{ row['en'] }}" required maxlength="100">
+              <input name="ko" value="{{ row['ko'] }}" required maxlength="200">
+              <button type="submit">저장</button>
+            </form>
+          </details>
+          <details>
+            <summary>삭제</summary>
+            <p>이 단어의 배정과 암기 기록이 함께 지워집니다.</p>
+            <form method="post" action="{{ url_for('words.delete_word', word_id=row['id']) }}">
+              <button type="submit">정말 삭제</button>
+            </form>
+          </details>
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="3">등록된 단어가 없습니다.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+
+<nav class="pager">
+  {% if page > 1 %}
+    <a href="{{ url_for('words.list_words', q=q, page=page - 1) }}">이전</a>
+  {% endif %}
+  <span>{{ page }} / {{ pages }}</span>
+  {% if page < pages %}
+    <a href="{{ url_for('words.list_words', q=q, page=page + 1) }}">다음</a>
+  {% endif %}
+</nav>
+{% endblock %}
