@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %}학습 진척 통계 · 단어장{% endblock %}
+{% block content %}
+<h1>학습 진척 통계</h1>
+
+<section>
+  <h2>진도 현황</h2>
+  <p>
+    현재 일차: <strong>{{ progress['current_day'] }}일차</strong> ·
+    암기한 단어: <strong>{{ progress['studied_words'] }} / {{ progress['total_words'] }}개 ({{ progress['percent'] }}%)</strong>
+  </p>
+</section>
+
+<section>
+  <h2>시험 성적 추이 (날짜별)</h2>
+  {% if daily %}
+    <table>
+      <thead>
+        <tr><th>날짜</th><th>응시 회수</th><th>맞은 문항 / 전체</th><th>정답률</th></tr>
+      </thead>
+      <tbody>
+        {% for d in daily %}
+        <tr>
+          <td>{{ d['date'] }}</td>
+          <td>{{ d['attempts'] }}회</td>
+          <td>{{ d['correct'] }} / {{ d['total'] }}</td>
+          <td>{{ d['percent'] }}%</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>아직 제출된 시험 기록이 없습니다.</p>
+  {% endif %}
+</section>
+
+<section>
+  <h2>시험 성적 추이 (회차별)</h2>
+  {% if attempts %}
+    <table>
+      <thead>
+        <tr><th>회차</th><th>날짜</th><th>방향</th><th>점수</th><th>정답률</th><th>보기</th></tr>
+      </thead>
+      <tbody>
+        {% for a in attempts %}
+        <tr>
+          <td>#{{ a['id'] }}</td>
+          <td>{{ a['date'] }}</td>
+          <td>{{ '영→한' if a['direction'] == 'en_ko' else ('한→영' if a['direction'] == 'ko_en' else '섞기') }}</td>
+          <td>{{ a['correct'] }} / {{ a['total'] }}</td>
+          <td>{{ a['percent'] }}%</td>
+          <td><a href="{{ url_for('exam.result', attempt_id=a['id']) }}">결과</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>아직 제출된 시험 기록이 없습니다.</p>
+  {% endif %}
+</section>
+
+<section>
+  <h2>자주 틀리는 단어 (상위 10개)</h2>
+  {% if top_wrong %}
+    <table>
+      <thead>
+        <tr><th>순위</th><th>영단어</th><th>뜻</th><th>오답 / 응시</th><th>오답률</th></tr>
+      </thead>
+      <tbody>
+        {% for w in top_wrong %}
+        <tr>
+          <td>{{ loop.index }}</td>
+          <td>{{ w['en'] }}</td>
+          <td>{{ w['ko'] }}</td>
+          <td class="err">{{ w['wrong_count'] }} / {{ w['total_count'] }}</td>
+          <td>{{ w['wrong_rate'] }}%</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>틀린 단어 기록이 없습니다.</p>
+  {% endif %}
+</section>
+{% endblock %}
