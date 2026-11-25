@@ -56,6 +56,30 @@
 </form>
 
 <section class="card">
+  <h2>학습 통계 공개 설정</h2>
+  {% if current_user %}
+    <p class="subtitle" style="margin-bottom:14px;">
+      현재 상태:
+      {% if current_user['is_public'] %}
+        <span class="chip chip-success">공개</span> (순위표에서 다른 사용자가 내 통계를 읽기 전용으로 볼 수 있습니다)
+      {% else %}
+        <span class="chip">비공개</span> (다른 사용자에게 내 통계가 표시되지 않습니다)
+      {% endif %}
+    </p>
+    <form method="post" action="{{ url_for('settings.update_privacy') }}">
+      <div class="choice-group" style="margin-bottom:16px;">
+        <label class="choice-pill"><input type="radio" name="is_public" value="1" {{ 'checked' if current_user['is_public'] }}> 공개</label>
+        <label class="choice-pill"><input type="radio" name="is_public" value="0" {{ 'checked' if not current_user['is_public'] }}> 비공개</label>
+      </div>
+      <button type="submit" class="btn-tonal">공개 설정 저장</button>
+    </form>
+  {% else %}
+    <p class="subtitle" style="margin-bottom:12px;">로그인한 계정만 학습 통계 공개/비공개 설정을 사용할 수 있습니다.</p>
+    <a class="btn btn-tonal btn-sm" href="{{ url_for('auth.login_form') }}">로그인하러 가기</a>
+  {% endif %}
+</section>
+
+<section class="card">
   <h2>기본값 복원</h2>
   <p class="subtitle" style="margin-bottom:14px;">하루 10개 · 복습 50%(5개) · 오답 복습 3개 · 시험 10문제(영→한, 단답+4지선다)로 되돌립니다.</p>
   <form method="post" action="{{ url_for('settings.reset') }}">

@@ -10,6 +10,7 @@ from db import close_request_db, init_db
 from routes.auth import bp as auth_bp
 from routes.auth import current_user
 from routes.exam import bp as exam_bp
+from routes.ranking import bp as ranking_bp
 from routes.settings import bp as settings_bp
 from routes.stats import bp as stats_bp
 from routes.study import bp as study_bp
@@ -29,6 +30,7 @@ def create_app() -> Flask:
     app.register_blueprint(study_bp, url_prefix="/study")
     app.register_blueprint(exam_bp, url_prefix="/exam")
     app.register_blueprint(stats_bp, url_prefix="/stats")
+    app.register_blueprint(ranking_bp, url_prefix="/ranking")
     app.register_blueprint(settings_bp, url_prefix="/settings")
 
     @app.context_processor

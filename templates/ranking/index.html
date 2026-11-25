@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}공개 순위표 · SmartVoca{% endblock %}
+{% block content %}
+<h1>공개 학습 순위표</h1>
+<p class="subtitle">통계 공개를 허용한 사용자들의 학습 진척 현황입니다. 비공개 계정은 표시되지 않으며 모든 통계는 읽기 전용입니다.</p>
+
+<section class="card">
+  {% if ranking %}
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>순위</th><th>사용자</th><th>현재 일차</th><th>암기 진행</th><th>시험 응시</th><th>평균 정답률</th><th>상세</th></tr>
+        </thead>
+        <tbody>
+          {% for r in ranking %}
+          <tr>
+            <td><span class="chip chip-primary">{{ loop.index }}</span></td>
+            <td>
+              <strong>{{ r['username'] }}</strong>
+              {% if current_user and current_user['id'] == r['id'] %}
+                <span class="chip chip-success">나</span>
+              {% endif %}
+            </td>
+            <td>{{ r['current_day'] }}일차</td>
+            <td style="min-width:150px;">
+              <strong>{{ r['studied_words'] }} / {{ r['total_words'] }}</strong> ({{ r['progress_percent'] }}%)
+              <div class="progress-track" style="height:6px; margin-top:4px;">
+                <div class="progress-fill" style="width:{{ r['progress_percent'] }}%;"></div>
+              </div>
+            </td>
+            <td>{{ r['exam_attempts'] }}회</td>
+            <td><strong>{{ r['avg_accuracy'] }}%</strong></td>
+            <td><a class="btn btn-tonal btn-sm" href="{{ url_for('ranking.detail', target_user_id=r['id']) }}">통계 보기</a></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="subtitle" style="margin:0 0 14px;">아직 통계를 공개한 사용자가 없습니다.</p>
+    <a class="btn btn-tonal btn-sm" href="{{ url_for('settings.index') }}">내 통계 공개 설정하기</a>
+  {% endif %}
+</section>
+{% endblock %}
