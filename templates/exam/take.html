@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}시험 풀이 · 단어장{% endblock %}
+{% block content %}
+<h1>시험 풀이 ({{ attempt['total'] }}문항)</h1>
+
+{% if notice %}<p class="msg">{{ notice }}</p>{% endif %}
+
+<form method="post" action="{{ url_for('exam.submit', attempt_id=attempt['id']) }}">
+  <ol>
+    {% for item in items %}
+      <li>
+        <p>
+          <strong>{{ item['prompt'] }}</strong>
+          ({{ '영→한' if item['direction'] == 'en_ko' else '한→영' }} · {{ '4지선다' if item['qtype'] == 'choice' else '단답형' }})
+        </p>
+        {% if item['qtype'] == 'choice' %}
+          {% for opt in item['choices_list'] %}
+            <label>
+              <input type="radio" name="ans_{{ item['id'] }}" value="{{ opt }}"> {{ opt }}
+            </label><br>
+          {% endfor %}
+        {% else %}
+          <input type="text" name="ans_{{ item['id'] }}" autocomplete="off" placeholder="정답 입력">
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ol>
+  <button type="submit">제출하고 채점하기</button>
+</form>
+{% endblock %}
