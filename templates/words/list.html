@@ -16,6 +16,25 @@
 </section>
 
 <section>
+  <h2>CSV 가져오기</h2>
+  <p>`영단어,뜻` 형식의 UTF-8 CSV 파일을 고르세요. 같은 영단어는 처음 한 개만 등록됩니다.</p>
+  <form method="post" action="{{ url_for('words.import_csv') }}" enctype="multipart/form-data">
+    <input type="file" name="file" accept=".csv,text/csv" required>
+    <button type="submit">가져오기</button>
+  </form>
+  {% if import_result %}
+    <div class="result">
+      <p>등록 {{ import_result['added'] }}개, 중복으로 건너뜀 {{ import_result['duplicates'] }}개, 오류 {{ import_result['error_total'] }}행</p>
+      {% if import_result['errors'] %}
+        <ul class="err">
+          {% for e in import_result['errors'] %}<li>{{ e }}</li>{% endfor %}
+        </ul>
+      {% endif %}
+    </div>
+  {% endif %}
+</section>
+
+<section>
   <h2>검색</h2>
   <form method="get" action="{{ url_for('words.list_words') }}">
     <input name="q" value="{{ q }}" placeholder="영단어 또는 뜻">
