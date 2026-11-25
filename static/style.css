@@ -120,7 +120,7 @@ button, .btn {
   min-height: 40px; padding: 0 20px; border-radius: 999px; border: none;
   background: var(--md-primary); color: var(--md-on-primary);
   font: inherit; font-size: .92rem; font-weight: 600; cursor: pointer;
-  transition: filter .15s, transform .08s, background .15s;
+  white-space: nowrap; transition: filter .15s, transform .08s, background .15s;
 }
 button:hover, .btn:hover { filter: brightness(1.06); text-decoration: none; }
 button:active, .btn:active { transform: scale(.98); }
@@ -143,7 +143,8 @@ input:focus { outline: 2px solid var(--md-primary); outline-offset: -1px; border
 /* Chips & Option Pills */
 .chip {
   display: inline-flex; align-items: center; padding: 3px 11px; border-radius: 999px;
-  font-size: .8rem; font-weight: 600; background: var(--md-surface-variant); color: var(--md-on-surface-variant);
+  font-size: .8rem; font-weight: 600; white-space: nowrap; flex-shrink: 0;
+  background: var(--md-surface-variant); color: var(--md-on-surface-variant);
 }
 .chip-primary { background: var(--md-primary-container); color: var(--md-on-primary-container); }
 .chip-success { background: var(--md-success-container); color: var(--md-on-success-container); }
@@ -165,7 +166,9 @@ input:focus { outline: 2px solid var(--md-primary); outline-offset: -1px; border
 .table-wrap { overflow-x: auto; }
 table { width: 100%; border-collapse: collapse; font-size: .93rem; }
 th, td { padding: 11px 12px; text-align: left; border-bottom: 1px solid var(--md-outline-variant); vertical-align: middle; }
-th { font-size: .82rem; font-weight: 700; color: var(--md-on-surface-variant); background: var(--md-surface-variant); }
+th { font-size: .82rem; font-weight: 700; color: var(--md-on-surface-variant); background: var(--md-surface-variant); white-space: nowrap; }
+td { word-break: keep-all; }
+.nowrap { white-space: nowrap; }
 th:first-child { border-radius: 10px 0 0 10px; }
 th:last-child { border-radius: 0 10px 10px 0; }
 .pager { display: flex; align-items: center; justify-content: center; gap: 12px; margin: 18px 0; }

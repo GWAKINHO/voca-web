@@ -99,11 +99,11 @@
         <tbody>
           {% for w in top_wrong %}
           <tr>
-            <td><span class="chip chip-error">{{ loop.index }}</span></td>
-            <td><strong>{{ w['en'] }}</strong></td>
+            <td class="nowrap"><span class="chip chip-error">{{ loop.index }}</span></td>
+            <td class="nowrap"><strong>{{ w['en'] }}</strong></td>
             <td>{{ w['ko'] }}</td>
-            <td class="err">{{ w['wrong_count'] }} / {{ w['total_count'] }}</td>
-            <td><strong>{{ w['wrong_rate'] }}%</strong></td>
+            <td class="err nowrap">{{ w['wrong_count'] }} / {{ w['total_count'] }}</td>
+            <td class="nowrap"><strong>{{ w['wrong_rate'] }}%</strong></td>
           </tr>
           {% endfor %}
         </tbody>

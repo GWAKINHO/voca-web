@@ -34,7 +34,7 @@
         <tbody>
           {% for item in wrong_items %}
           <tr>
-            <td>{{ item['seq'] }}</td>
+            <td class="nowrap">{{ item['seq'] }}</td>
             <td><strong>{{ item['prompt'] }}</strong>{% if item['word_id'] is none %} <span class="chip">삭제된 단어</span>{% endif %}</td>
             <td class="err">{{ item['answer_given'] or '(미입력)' }}</td>
             <td class="ok">{{ item['expected'] }}</td>
@@ -58,12 +58,12 @@
       <tbody>
         {% for item in items %}
         <tr>
-          <td>{{ item['seq'] }}</td>
+          <td class="nowrap">{{ item['seq'] }}</td>
           <td><strong>{{ item['prompt'] }}</strong>{% if item['word_id'] is none %} <span class="chip">삭제된 단어</span>{% endif %}</td>
-          <td><span class="chip">{{ '4지선다' if item['qtype'] == 'choice' else '단답형' }}</span></td>
+          <td class="nowrap"><span class="chip">{{ '4지선다' if item['qtype'] == 'choice' else '단답형' }}</span></td>
           <td>{{ item['answer_given'] or '(미입력)' }}</td>
           <td>{{ item['expected'] }}</td>
-          <td>
+          <td class="nowrap">
             {% if item['is_correct'] %}
               <span class="chip chip-success">정답</span>
             {% else %}
