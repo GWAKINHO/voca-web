@@ -7,7 +7,7 @@ import os
 import tempfile
 import unittest
 
-from db import get_db, init_db
+from db import SCHEMA_VERSION, get_db, init_db
 from services import word_service as ws
 
 
@@ -33,11 +33,11 @@ class WordServiceTest(unittest.TestCase):
             )
         }
         self.assertTrue(
-            {"words", "study_day", "plan", "study_log", "exam_attempt", "exam_item"}
+            {"words", "study_day", "plan", "study_log", "exam_attempt", "exam_item", "user_settings"}
             <= names
         )
         version = self.conn.execute("PRAGMA user_version").fetchone()[0]
-        self.assertEqual(version, 1)
+        self.assertEqual(version, SCHEMA_VERSION)
 
     # VOCA-FR-001: 등록
     def test_add_word_and_normalize_key(self):

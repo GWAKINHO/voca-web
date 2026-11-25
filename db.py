@@ -8,7 +8,7 @@ import sqlite3
 
 from config import DB_PATH
 
-SCHEMA_VERSION = 1  # PRAGMA user_version 에 기록한다 (데이터 설계서 §1)
+SCHEMA_VERSION = 2  # PRAGMA user_version 에 기록한다 (데이터 설계서 §1)
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS words (
@@ -62,6 +62,16 @@ CREATE TABLE IF NOT EXISTS exam_item (
 );
 CREATE INDEX IF NOT EXISTS idx_item_attempt ON exam_item(attempt_id);
 CREATE INDEX IF NOT EXISTS idx_item_word ON exam_item(word_id);
+CREATE TABLE IF NOT EXISTS user_settings (
+  user_id INTEGER PRIMARY KEY,
+  daily_count INTEGER NOT NULL DEFAULT 10,
+  review_ratio INTEGER NOT NULL DEFAULT 50,
+  review_wrong_count INTEGER NOT NULL DEFAULT 3,
+  exam_count INTEGER NOT NULL DEFAULT 10,
+  exam_direction TEXT NOT NULL DEFAULT 'en_ko' CHECK (exam_direction IN ('en_ko', 'ko_en', 'mixed')),
+  exam_qtypes TEXT NOT NULL DEFAULT 'short,choice',
+  updated_at TEXT NOT NULL
+);
 """
 
 

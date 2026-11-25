@@ -7,6 +7,7 @@ from flask import Blueprint, abort, redirect, render_template, request, url_for
 
 from db import request_db
 from services import exam_service as es
+from services import settings_service as ssvc
 from services.exam_service import ExamError, NotFoundError
 
 # app.py 에서 url_prefix="/exam" 로 등록한다. 주소는 모두 url_for 로 만든다 (R-04)
@@ -17,9 +18,11 @@ bp = Blueprint("exam", __name__)
 def new_form():
     conn = request_db()
     word_count = conn.execute("SELECT COUNT(*) FROM words").fetchone()[0]
+    cfg = ssvc.get_settings(conn)
     return render_template(
         "exam/new.html",
         word_count=word_count,
+        settings=cfg,
         err=request.args.get("err", ""),
     )
 

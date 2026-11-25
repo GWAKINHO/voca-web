@@ -19,25 +19,25 @@
 
     <div class="field" style="max-width:220px; margin-bottom:20px;">
       <label for="exam-count">문제 수 (1~50)</label>
-      <input id="exam-count" type="number" name="count" min="1" max="50" value="{{ 10 if word_count >= 10 else word_count }}" required>
+      <input id="exam-count" type="number" name="count" min="1" max="50" value="{{ settings['exam_count'] if word_count >= settings['exam_count'] else word_count }}" required>
     </div>
 
     <div style="margin-bottom:20px;">
       <h2>출제 방향</h2>
       <div class="choice-group">
-        <label class="choice-pill"><input type="radio" name="direction" value="en_ko" checked> 영→한</label>
-        <label class="choice-pill"><input type="radio" name="direction" value="ko_en"> 한→영</label>
-        <label class="choice-pill"><input type="radio" name="direction" value="mixed"> 섞기</label>
+        <label class="choice-pill"><input type="radio" name="direction" value="en_ko" {{ 'checked' if settings['exam_direction'] == 'en_ko' }}> 영→한</label>
+        <label class="choice-pill"><input type="radio" name="direction" value="ko_en" {{ 'checked' if settings['exam_direction'] == 'ko_en' }}> 한→영</label>
+        <label class="choice-pill"><input type="radio" name="direction" value="mixed" {{ 'checked' if settings['exam_direction'] == 'mixed' }}> 섞기</label>
       </div>
     </div>
 
     <div style="margin-bottom:24px;">
       <h2>출제 형식</h2>
       <div class="choice-group">
-        <label class="choice-pill"><input type="checkbox" name="qtype" value="short" checked> 단답형</label>
-        <label class="choice-pill"><input type="checkbox" name="qtype" value="choice" checked> 4지선다</label>
+        <label class="choice-pill"><input type="checkbox" name="qtype" value="short" {{ 'checked' if 'short' in settings['exam_qtypes_list'] }}> 단답형</label>
+        <label class="choice-pill"><input type="checkbox" name="qtype" value="choice" {{ 'checked' if 'choice' in settings['exam_qtypes_list'] }}> 4지선다</label>
       </div>
-      <p class="subtitle" style="margin:10px 0 0; font-size:.86rem;">보기가 4개 미만이면 해당 문항은 단답형으로 자동 출제됩니다.</p>
+      <p class="subtitle" style="margin:10px 0 0; font-size:.86rem;">보기가 4개 미만이면 해당 문항은 단답형으로 자동 출제됩니다. 기본값은 <a href="{{ url_for('settings.index') }}">설정</a>에서 바꿀 수 있습니다.</p>
     </div>
 
     <button type="submit">시험 시작</button>

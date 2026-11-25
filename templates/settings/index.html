@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}학습 설정 · SmartVoca{% endblock %}
+{% block content %}
+<h1>학습 설정</h1>
+<p class="subtitle">하루 학습량, 복습 비율, 시험 기본값을 변경하면 DB에 저장되어 재접속해도 유지됩니다.</p>
+
+{% if msg %}<div class="banner msg">{{ msg }}</div>{% endif %}
+{% if err %}<div class="banner err-banner">{{ err }}</div>{% endif %}
+
+<form class="card" method="post" action="{{ url_for('settings.save') }}">
+  <h2>암기 설정</h2>
+  <div class="form-row" style="margin-bottom:18px;">
+    <div class="field">
+      <label for="daily-count">하루 학습량 (1~100개)</label>
+      <input id="daily-count" type="number" name="daily_count" min="1" max="100" value="{{ settings['daily_count'] }}" required>
+    </div>
+    <div class="field">
+      <label for="review-ratio">직전 일차 복습 비율 (0~100%)</label>
+      <input id="review-ratio" type="number" name="review_ratio" min="0" max="100" value="{{ settings['review_ratio'] }}" required>
+    </div>
+    <div class="field">
+      <label for="review-wrong">자주 틀린 단어 최대 복습 수 (0~20개)</label>
+      <input id="review-wrong" type="number" name="review_wrong_count" min="0" max="20" value="{{ settings['review_wrong_count'] }}" required>
+    </div>
+  </div>
+  <p class="subtitle" style="margin-bottom:22px; font-size:.88rem;">
+    현재 기준 직전 일차 복습 단어: <strong>{{ settings['review_prev_count'] }}개</strong> (새로 배정되는 일차부터 하루 학습량이 적용됩니다)
+  </p>
+
+  <h2>시험 기본값</h2>
+  <div class="field" style="max-width:220px; margin-bottom:18px;">
+    <label for="exam-count">기본 문제 수 (1~50)</label>
+    <input id="exam-count" type="number" name="exam_count" min="1" max="50" value="{{ settings['exam_count'] }}" required>
+  </div>
+
+  <div style="margin-bottom:18px;">
+    <label class="field-label">기본 출제 방향</label>
+    <div class="choice-group">
+      <label class="choice-pill"><input type="radio" name="exam_direction" value="en_ko" {{ 'checked' if settings['exam_direction'] == 'en_ko' }}> 영→한</label>
+      <label class="choice-pill"><input type="radio" name="exam_direction" value="ko_en" {{ 'checked' if settings['exam_direction'] == 'ko_en' }}> 한→영</label>
+      <label class="choice-pill"><input type="radio" name="exam_direction" value="mixed" {{ 'checked' if settings['exam_direction'] == 'mixed' }}> 섞기</label>
+    </div>
+  </div>
+
+  <div style="margin-bottom:24px;">
+    <label class="field-label">기본 출제 형식</label>
+    <div class="choice-group">
+      <label class="choice-pill"><input type="checkbox" name="exam_qtypes" value="short" {{ 'checked' if 'short' in settings['exam_qtypes_list'] }}> 단답형</label>
+      <label class="choice-pill"><input type="checkbox" name="exam_qtypes" value="choice" {{ 'checked' if 'choice' in settings['exam_qtypes_list'] }}> 4지선다</label>
+    </div>
+  </div>
+
+  <div style="display:flex; gap:10px; flex-wrap:wrap;">
+    <button type="submit">설정 저장</button>
+  </div>
+</form>
+
+<section class="card">
+  <h2>기본값 복원</h2>
+  <p class="subtitle" style="margin-bottom:14px;">하루 10개 · 복습 50%(5개) · 오답 복습 3개 · 시험 10문제(영→한, 단답+4지선다)로 되돌립니다.</p>
+  <form method="post" action="{{ url_for('settings.reset') }}">
+    <button type="submit" class="btn-outlined">기본값으로 복원</button>
+  </form>
+</section>
+{% endblock %}

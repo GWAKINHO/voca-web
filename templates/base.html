@@ -16,6 +16,7 @@
         <a href="{{ url_for('study.today') }}" class="{{ 'active' if request.endpoint and request.endpoint.startswith('study.') }}">오늘 암기</a>
         <a href="{{ url_for('exam.new_form') }}" class="{{ 'active' if request.endpoint and request.endpoint.startswith('exam.') }}">시험</a>
         <a href="{{ url_for('stats.index') }}" class="{{ 'active' if request.endpoint and request.endpoint.startswith('stats.') }}">통계</a>
+        <a href="{{ url_for('settings.index') }}" class="{{ 'active' if request.endpoint and request.endpoint.startswith('settings.') }}">설정</a>
       </nav>
     </div>
   </header>

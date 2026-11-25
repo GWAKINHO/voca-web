@@ -10,7 +10,7 @@ import unittest
 from datetime import datetime
 
 from config import KST
-from db import get_db, init_db
+from db import SCHEMA_VERSION, get_db, init_db
 from services import exam_service as es
 from services import stats_service as st
 from services import study_service as ss
@@ -123,7 +123,7 @@ class StatsAndResetTest(unittest.TestCase):
         ws.reset_all_data(self.conn, "전체삭제")
         for tbl in ("exam_item", "exam_attempt", "study_log", "plan", "study_day", "words"):
             self.assertEqual(self.conn.execute(f"SELECT COUNT(*) FROM {tbl}").fetchone()[0], 0)
-        self.assertEqual(self.conn.execute("PRAGMA user_version").fetchone()[0], 1)
+        self.assertEqual(self.conn.execute("PRAGMA user_version").fetchone()[0], SCHEMA_VERSION)
 
 
 if __name__ == "__main__":
