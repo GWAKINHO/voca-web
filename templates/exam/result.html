@@ -1,55 +1,84 @@
 {% extends "base.html" %}
-{% block title %}시험 결과 · 단어장{% endblock %}
+{% block title %}시험 결과 · SmartVoca{% endblock %}
 {% block content %}
 <h1>시험 결과</h1>
 
-<p class="msg">
-  점수: <strong>{{ attempt['correct'] }} / {{ attempt['total'] }} ({{ percent }}%)</strong>
-</p>
+<section class="card">
+  <div class="stat-row" style="margin-top:0;">
+    <div class="stat-box">
+      <div class="stat-label">맞은 문항</div>
+      <div class="stat-value">{{ attempt['correct'] }} / {{ attempt['total'] }}</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-label">정답률</div>
+      <div class="stat-value">{{ percent }}%</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-label">틀린 문항</div>
+      <div class="stat-value" style="color:var(--md-error);">{{ wrong_items|length }}개</div>
+    </div>
+  </div>
+  <div class="progress-track" style="margin-top:16px;">
+    <div class="progress-fill" style="width:{{ percent }}%;"></div>
+  </div>
+</section>
 
 {% if wrong_items %}
-  <section>
+  <section class="card card-danger">
     <h2>틀린 문항 ({{ wrong_items|length }}개)</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>번호</th><th>문제</th><th>내 답</th><th>정답</th></tr>
+        </thead>
+        <tbody>
+          {% for item in wrong_items %}
+          <tr>
+            <td>{{ item['seq'] }}</td>
+            <td><strong>{{ item['prompt'] }}</strong>{% if item['word_id'] is none %} <span class="chip">삭제된 단어</span>{% endif %}</td>
+            <td class="err">{{ item['answer_given'] or '(미입력)' }}</td>
+            <td class="ok">{{ item['expected'] }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+{% else %}
+  <div class="banner msg">모든 문제를 맞혔습니다!</div>
+{% endif %}
+
+<section class="card">
+  <h2>전체 문항</h2>
+  <div class="table-wrap">
     <table>
       <thead>
-        <tr><th>번호</th><th>문제</th><th>내 답</th><th>정답</th></tr>
+        <tr><th>번호</th><th>문제</th><th>형식</th><th>내 답</th><th>정답</th><th>결과</th></tr>
       </thead>
       <tbody>
-        {% for item in wrong_items %}
+        {% for item in items %}
         <tr>
           <td>{{ item['seq'] }}</td>
-          <td>{{ item['prompt'] }}{% if item['word_id'] is none %} (삭제된 단어){% endif %}</td>
-          <td class="err">{{ item['answer_given'] or '(미입력)' }}</td>
+          <td><strong>{{ item['prompt'] }}</strong>{% if item['word_id'] is none %} <span class="chip">삭제된 단어</span>{% endif %}</td>
+          <td><span class="chip">{{ '4지선다' if item['qtype'] == 'choice' else '단답형' }}</span></td>
+          <td>{{ item['answer_given'] or '(미입력)' }}</td>
           <td>{{ item['expected'] }}</td>
+          <td>
+            {% if item['is_correct'] %}
+              <span class="chip chip-success">정답</span>
+            {% else %}
+              <span class="chip chip-error">오답</span>
+            {% endif %}
+          </td>
         </tr>
         {% endfor %}
       </tbody>
     </table>
-  </section>
-{% else %}
-  <p class="msg">모든 문제를 맞혔습니다!</p>
-{% endif %}
-
-<section>
-  <h2>전체 문항</h2>
-  <table>
-    <thead>
-      <tr><th>번호</th><th>문제</th><th>형식</th><th>내 답</th><th>정답</th><th>결과</th></tr>
-    </thead>
-    <tbody>
-      {% for item in items %}
-      <tr>
-        <td>{{ item['seq'] }}</td>
-        <td>{{ item['prompt'] }}{% if item['word_id'] is none %} (삭제된 단어){% endif %}</td>
-        <td>{{ '4지선다' if item['qtype'] == 'choice' else '단답형' }}</td>
-        <td>{{ item['answer_given'] or '(미입력)' }}</td>
-        <td>{{ item['expected'] }}</td>
-        <td>{% if item['is_correct'] %}<span class="msg">정답</span>{% else %}<span class="err">오답</span>{% endif %}</td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+  </div>
 </section>
 
-<p><a href="{{ url_for('exam.new_form') }}">새 시험 보기</a></p>
+<div style="display:flex; gap:10px; flex-wrap:wrap;">
+  <a class="btn" href="{{ url_for('exam.new_form') }}">새 시험 보기</a>
+  <a class="btn btn-tonal" href="{{ url_for('stats.index') }}">학습 통계 보기</a>
+</div>
 {% endblock %}

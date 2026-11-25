@@ -1,12 +1,29 @@
 {% extends "base.html" %}
-{% block title %}단어장{% endblock %}
+{% block title %}SmartVoca 단어장{% endblock %}
 {% block content %}
-<h1>단어장</h1>
-<p>영단어를 외우고 시험으로 확인하는 웹 앱입니다.</p>
-<ul>
-  <li><a href="{{ url_for('words.list_words') }}">단어 목록 관리</a></li>
-  <li><a href="{{ url_for('study.today') }}">오늘 암기</a></li>
-  <li><a href="{{ url_for('exam.new_form') }}">단어 시험</a></li>
-  <li><a href="{{ url_for('stats.index') }}">학습 진척 통계</a></li>
-</ul>
+<h1>SmartVoca 단어장</h1>
+<p class="subtitle">영단어를 체계적으로 암기하고, 가중치 시험과 통계로 학습 진척을 확인하세요.</p>
+
+<div class="card-grid">
+  <a class="feature-card" href="{{ url_for('words.list_words') }}">
+    <span class="chip chip-primary">단어 관리</span>
+    <span class="fc-title">단어 목록 관리</span>
+    <span class="fc-desc">영단어 등록·수정·삭제·검색 및 CSV 일괄 가져오기</span>
+  </a>
+  <a class="feature-card" href="{{ url_for('study.today') }}">
+    <span class="chip chip-primary">일일 학습</span>
+    <span class="fc-title">오늘 암기</span>
+    <span class="fc-desc">하루 목표량 자동 배정, 플래시카드 암기 및 오답 복습</span>
+  </a>
+  <a class="feature-card" href="{{ url_for('exam.new_form') }}">
+    <span class="chip chip-primary">실력 점검</span>
+    <span class="fc-title">단어 시험</span>
+    <span class="fc-desc">가중치 출제, 단답형·4지선다 풀이 및 자동 채점</span>
+  </a>
+  <a class="feature-card" href="{{ url_for('stats.index') }}">
+    <span class="chip chip-primary">분석 리포트</span>
+    <span class="fc-title">학습 진척 통계</span>
+    <span class="fc-desc">암기 진행률, 시험 성적 추이 및 자주 틀리는 단어 TOP 10</span>
+  </a>
+</div>
 {% endblock %}

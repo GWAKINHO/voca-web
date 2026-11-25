@@ -1,32 +1,41 @@
 {% extends "base.html" %}
-{% block title %}단어 목록 · 단어장{% endblock %}
+{% block title %}단어 목록 · SmartVoca{% endblock %}
 {% block content %}
 <h1>단어 목록</h1>
+<p class="subtitle">전체 <strong>{{ total }}개</strong>의 단어가 등록되어 있습니다.</p>
 
-{% if msg %}<p class="msg">{{ msg }}</p>{% endif %}
-{% if err %}<p class="err">{{ err }}</p>{% endif %}
+{% if msg %}<div class="banner msg">{{ msg }}</div>{% endif %}
+{% if err %}<div class="banner err-banner">{{ err }}</div>{% endif %}
 
-<section>
+<section class="card">
   <h2>단어 등록</h2>
-  <form method="post" action="{{ url_for('words.create_word') }}">
-    <label>영단어 <input name="en" required maxlength="100"></label>
-    <label>뜻 <input name="ko" required maxlength="200"></label>
+  <form class="form-row" method="post" action="{{ url_for('words.create_word') }}">
+    <div class="field">
+      <label for="add-en">영단어</label>
+      <input id="add-en" name="en" required maxlength="100" placeholder="예: apple">
+    </div>
+    <div class="field">
+      <label for="add-ko">뜻</label>
+      <input id="add-ko" name="ko" required maxlength="200" placeholder="예: 사과">
+    </div>
     <button type="submit">등록</button>
   </form>
 </section>
 
-<section>
-  <h2>CSV 가져오기</h2>
-  <p>`영단어,뜻` 형식의 UTF-8 CSV 파일을 고르세요. 같은 영단어는 처음 한 개만 등록됩니다.</p>
-  <form method="post" action="{{ url_for('words.import_csv') }}" enctype="multipart/form-data">
-    <input type="file" name="file" accept=".csv,text/csv" required>
-    <button type="submit">가져오기</button>
+<section class="card">
+  <h2>CSV 일괄 가져오기</h2>
+  <p class="subtitle" style="margin-bottom:12px;"><code>영단어,뜻</code> 형식의 UTF-8 CSV 파일을 선택하세요. 중복 영단어는 처음 한 개만 등록됩니다.</p>
+  <form class="form-row" method="post" action="{{ url_for('words.import_csv') }}" enctype="multipart/form-data">
+    <div class="field">
+      <input type="file" name="file" accept=".csv,text/csv" required>
+    </div>
+    <button type="submit" class="btn-tonal">가져오기</button>
   </form>
   {% if import_result %}
-    <div class="result">
-      <p>등록 {{ import_result['added'] }}개, 중복으로 건너뜀 {{ import_result['duplicates'] }}개, 오류 {{ import_result['error_total'] }}행</p>
+    <div class="banner msg" style="margin-top:14px; margin-bottom:0;">
+      등록 <strong>{{ import_result['added'] }}개</strong> · 중복 건너뜀 <strong>{{ import_result['duplicates'] }}개</strong> · 오류 <strong>{{ import_result['error_total'] }}행</strong>
       {% if import_result['errors'] %}
-        <ul class="err">
+        <ul class="err" style="margin:8px 0 0 18px; padding:0;">
           {% for e in import_result['errors'] %}<li>{{ e }}</li>{% endfor %}
         </ul>
       {% endif %}
@@ -34,69 +43,76 @@
   {% endif %}
 </section>
 
-<section>
-  <h2>검색</h2>
-  <form method="get" action="{{ url_for('words.list_words') }}">
-    <input name="q" value="{{ q }}" placeholder="영단어 또는 뜻">
+<section class="card">
+  <h2>검색 및 목록</h2>
+  <form class="form-row" method="get" action="{{ url_for('words.list_words') }}" style="margin-bottom:16px;">
+    <div class="field">
+      <input name="q" value="{{ q }}" placeholder="영단어 또는 뜻으로 검색">
+    </div>
     <button type="submit">검색</button>
+    {% if q %}
+      <a class="btn btn-outlined" href="{{ url_for('words.list_words') }}">초기화</a>
+    {% endif %}
   </form>
-  <p>전체 {{ total }}개</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>영단어</th><th>뜻</th><th>관리</th></tr>
+      </thead>
+      <tbody>
+        {% for row in rows %}
+        <tr>
+          <td><strong>{{ row['en'] }}</strong></td>
+          <td>{{ row['ko'] }}</td>
+          <td>
+            <div class="inline-actions">
+              <details>
+                <summary>수정</summary>
+                <form class="form-row" method="post" action="{{ url_for('words.edit_word', word_id=row['id']) }}" style="margin-top:8px;">
+                  <div class="field"><input name="en" value="{{ row['en'] }}" required maxlength="100"></div>
+                  <div class="field"><input name="ko" value="{{ row['ko'] }}" required maxlength="200"></div>
+                  <button type="submit" class="btn-sm">저장</button>
+                </form>
+              </details>
+              <details>
+                <summary class="err">삭제</summary>
+                <p class="err" style="margin:8px 0;">이 단어의 배정과 암기 기록이 함께 삭제됩니다.</p>
+                <form method="post" action="{{ url_for('words.delete_word', word_id=row['id']) }}">
+                  <button type="submit" class="btn-danger btn-sm">정말 삭제</button>
+                </form>
+              </details>
+            </div>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="3" style="text-align:center; padding:24px; color:var(--md-on-surface-variant);">등록된 단어가 없습니다.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <nav class="pager">
+    {% if page > 1 %}
+      <a class="btn btn-outlined btn-sm" href="{{ url_for('words.list_words', q=q, page=page - 1) }}">이전</a>
+    {% endif %}
+    <span class="chip">{{ page }} / {{ pages }}</span>
+    {% if page < pages %}
+      <a class="btn btn-outlined btn-sm" href="{{ url_for('words.list_words', q=q, page=page + 1) }}">다음</a>
+    {% endif %}
+  </nav>
 </section>
 
-<section>
-  <table>
-    <thead>
-      <tr><th>영단어</th><th>뜻</th><th>관리</th></tr>
-    </thead>
-    <tbody>
-      {% for row in rows %}
-      <tr>
-        <td>{{ row['en'] }}</td>
-        <td>{{ row['ko'] }}</td>
-        <td>
-          <details>
-            <summary>수정</summary>
-            <form method="post" action="{{ url_for('words.edit_word', word_id=row['id']) }}">
-              <input name="en" value="{{ row['en'] }}" required maxlength="100">
-              <input name="ko" value="{{ row['ko'] }}" required maxlength="200">
-              <button type="submit">저장</button>
-            </form>
-          </details>
-          <details>
-            <summary>삭제</summary>
-            <p>이 단어의 배정과 암기 기록이 함께 지워집니다.</p>
-            <form method="post" action="{{ url_for('words.delete_word', word_id=row['id']) }}">
-              <button type="submit">정말 삭제</button>
-            </form>
-          </details>
-        </td>
-      </tr>
-      {% else %}
-      <tr><td colspan="3">등록된 단어가 없습니다.</td></tr>
-      {% endfor %}
-    </tbody>
-  </table>
-</section>
-
-<nav class="pager">
-  {% if page > 1 %}
-    <a href="{{ url_for('words.list_words', q=q, page=page - 1) }}">이전</a>
-  {% endif %}
-  <span>{{ page }} / {{ pages }}</span>
-  {% if page < pages %}
-    <a href="{{ url_for('words.list_words', q=q, page=page + 1) }}">다음</a>
-  {% endif %}
-</nav>
-
-<section>
+<section class="card card-danger">
   <details>
-    <summary>단어장 전체 초기화 (되돌릴 수 없음)</summary>
-    <p class="err">단어, 일차 배정, 암기 기록, 시험 기록이 모두 삭제되며 되돌릴 수 없습니다.</p>
-    <form method="post" action="{{ url_for('words.reset_all') }}">
-      <label>확인 문구 <code>전체삭제</code> 입력
-        <input name="confirm_text" required autocomplete="off" placeholder="전체삭제">
-      </label>
-      <button type="submit">전체 초기화 실행</button>
+    <summary class="err">단어장 전체 초기화 (되돌릴 수 없음)</summary>
+    <p class="err" style="margin:10px 0 12px;">단어, 일차 배정, 암기 기록, 시험 기록이 모두 삭제되며 되돌릴 수 없습니다.</p>
+    <form class="form-row" method="post" action="{{ url_for('words.reset_all') }}">
+      <div class="field">
+        <label for="confirm-reset">확인 문구 <code>전체삭제</code> 입력</label>
+        <input id="confirm-reset" name="confirm_text" required autocomplete="off" placeholder="전체삭제">
+      </div>
+      <button type="submit" class="btn-danger">전체 초기화 실행</button>
     </form>
   </details>
 </section>
