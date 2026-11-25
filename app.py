@@ -7,6 +7,7 @@ from flask import Flask, render_template
 
 from config import DB_PATH, MAX_CONTENT_LENGTH, SECRET_KEY
 from db import close_request_db, init_db
+from routes.study import bp as study_bp
 from routes.words import bp as words_bp
 
 
@@ -19,6 +20,7 @@ def create_app() -> Flask:
     app.teardown_appcontext(close_request_db)
 
     app.register_blueprint(words_bp, url_prefix="/words")
+    app.register_blueprint(study_bp, url_prefix="/study")
 
     @app.get("/")
     def index():
