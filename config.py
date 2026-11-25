@@ -17,6 +17,9 @@ SECRET_KEY = os.environ.get("SECRET_KEY") or secrets.token_hex(32)
 KST = timezone(timedelta(hours=9))
 
 DAILY_COUNT = 10              # 하루 학습량 (D-4)
+REVIEW_PREV_COUNT = 5         # 직전 일차에서 복습에 섞는 단어 수 (D-5)
+REVIEW_WRONG_COUNT = 3        # 자주 틀린 단어를 섞는 최대 수 (D-5)
+WRONG_THRESHOLD = 2           # 이 횟수 이상 틀리면 "자주 틀린 단어" (D-5)
 WORDS_PER_PAGE = 50           # 단어 목록 페이지 크기
 MAX_CONTENT_LENGTH = 20 * 1024 * 1024  # CSV 업로드 상한, 서버 기준과 맞춤 (A-7)
 
