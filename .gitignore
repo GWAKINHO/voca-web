@@ -1,0 +1,14 @@
+# 파이썬 산출물
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# 로컬 DB 와 비밀값 (커밋 금지)
+*.db
+data/
+.env
+
+# IDE
+.vscode/
+.idea/
